@@ -15,12 +15,14 @@ import { LoginData } from "./login.type";
 import { LoadingButton } from "@mui/lab";
 import { formLabel as loginFormLabel } from "./login-config";
 import { MuiSnackbar } from "../../components/MuiSnackbar";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const { control, handleSubmit } = useForm<LoginData>();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLogining, setIsLogining] = useState<boolean>(false);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -39,11 +41,10 @@ export const Login = () => {
       const result = await axios.post("/v2/admin/signin", data);
       const { token, expired } = result.data;
       document.cookie = `hexToken=${token}; expires=${new Date(expired)}`;
-      if (result?.data?.success) {
-        // navigate("/admin/products");
-        console.log(result);
-      }
       setIsLogining(false);
+      if (result?.data?.success) {
+        navigate("/admin/products");
+      }
     } catch (error: any) {
       console.log(error);
       setLoginState(error.response.data);
@@ -53,7 +54,7 @@ export const Login = () => {
   };
 
   const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
+    _event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
     if (reason === "clickaway") {

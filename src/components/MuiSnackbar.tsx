@@ -1,4 +1,4 @@
-import { Snackbar, Button, Alert, AlertProps } from "@mui/material";
+import { Snackbar, Alert, AlertProps } from "@mui/material";
 import { useState, forwardRef, useEffect } from "react";
 
 const SnackbarAlert = forwardRef<HTMLDivElement, AlertProps>(
