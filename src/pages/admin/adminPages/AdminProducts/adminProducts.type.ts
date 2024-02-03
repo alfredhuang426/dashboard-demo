@@ -1,10 +1,4 @@
-export type Pagination = {
-  category?: string;
-  current_page?: number;
-  has_next?: boolean;
-  has_pre?: boolean;
-  total_pages?: number;
-};
+import { Pagination } from "../../../../shared/shared.type";
 
 export type Product = {
   category?: string;
@@ -18,4 +12,9 @@ export type Product = {
   price?: number;
   title?: string;
   unit?: string;
+};
+
+export type ProductData = {
+  products?: Product[];
+  pagination?: Pagination;
 };
