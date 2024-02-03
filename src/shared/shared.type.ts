@@ -5,3 +5,10 @@ export type Pagination = {
   has_pre?: boolean;
   total_pages?: number;
 };
+
+export type User = {
+  address?: string;
+  email?: string;
+  name?: string;
+  tel?: string;
+};
