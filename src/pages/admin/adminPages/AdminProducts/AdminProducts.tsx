@@ -11,17 +11,29 @@ import {
   Box,
   CircularProgress,
   Grid,
+  Stack,
+  Button,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Product, ProductData } from "./adminProducts.type";
 import { Pagination as ProductPagination } from "../../../../shared/shared.type";
+import { ProductModal } from "../../adminComponents/ProductModal/ProductModal";
 
 export const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [allProductData, setAllProductData] = useState<ProductData[]>([]);
   const [pagination, setPagination] = useState<ProductPagination>({});
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const handleClickOpen = () => {
+    setIsOpenModal(true);
+  };
+
+  const handleClose = () => {
+    setIsOpenModal(false);
+  };
 
   useEffect(() => {
     getProducts();
@@ -62,10 +74,11 @@ export const AdminProducts = () => {
 
   return (
     <>
+      <ProductModal open={isOpenModal} handleClose={handleClose} />
       <Typography variant="h6" mb={2}>
         產品列表
       </Typography>
-      <Divider sx={{ mb: 3 }} />
+      <Divider sx={{ mb: 2 }} />
       {isTableLoading ? (
         <Grid
           container
@@ -78,6 +91,16 @@ export const AdminProducts = () => {
         </Grid>
       ) : (
         <>
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            alignItems="center"
+            mb={2}
+          >
+            <Button variant="contained" onClick={handleClickOpen}>
+              建立新商品
+            </Button>
+          </Stack>
           <TableContainer sx={{ mb: 3 }}>
             <Table sx={{ minWidth: 650 }} aria-label="products table">
               <TableHead>
@@ -85,8 +108,10 @@ export const AdminProducts = () => {
                   <TableCell>分類</TableCell>
                   <TableCell align="right">名稱</TableCell>
                   <TableCell align="right">售價</TableCell>
-                  <TableCell align="right">啟用狀態</TableCell>
-                  <TableCell align="right">編輯</TableCell>
+                  <TableCell align="center">啟用狀態</TableCell>
+                  <TableCell align="center" width="20%">
+                    編輯
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -100,10 +125,23 @@ export const AdminProducts = () => {
                     </TableCell>
                     <TableCell align="right">{product?.title}</TableCell>
                     <TableCell align="right">{product?.price}</TableCell>
-                    <TableCell align="right">
+                    <TableCell align="center">
                       {product?.is_enabled ? "啟用" : "未啟用"}
                     </TableCell>
-                    <TableCell align="right"></TableCell>
+                    <TableCell align="center">
+                      <Stack
+                        direction="row"
+                        justifyContent="center"
+                        spacing={1}
+                      >
+                        <Button variant="contained" onClick={handleClickOpen}>
+                          編輯
+                        </Button>
+                        <Button variant="outlined" color="error">
+                          刪除
+                        </Button>
+                      </Stack>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

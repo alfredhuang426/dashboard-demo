@@ -105,7 +105,7 @@ export const AdminOrders = () => {
                       {order.is_paid ? (
                         <Typography color="success.main">已付款</Typography>
                       ) : (
-                        <Typography color="warning.main">未付款</Typography>
+                        <Typography color="error.main">未付款</Typography>
                       )}
                     </TableCell>
                     <TableCell align="right">{order.message}</TableCell>
