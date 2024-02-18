@@ -25,13 +25,19 @@ export const AdminProducts = () => {
   const [allProductData, setAllProductData] = useState<ProductData[]>([]);
   const [pagination, setPagination] = useState<ProductPagination>({});
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [modalTitle, setModalTitle] = useState<string>("");
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (title: string) => {
+    setModalTitle(title);
     setIsOpenModal(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (
+    event?: React.FormEvent<HTMLFormElement>,
+    reason?: string
+  ) => {
+    if (reason && reason === "backdropClick") return;
     setIsOpenModal(false);
   };
 
@@ -74,7 +80,11 @@ export const AdminProducts = () => {
 
   return (
     <>
-      <ProductModal open={isOpenModal} handleClose={handleClose} />
+      <ProductModal
+        open={isOpenModal}
+        modalTitle={modalTitle}
+        handleClose={handleClose}
+      />
       <Typography variant="h6" mb={2}>
         產品列表
       </Typography>
@@ -97,7 +107,10 @@ export const AdminProducts = () => {
             alignItems="center"
             mb={2}
           >
-            <Button variant="contained" onClick={handleClickOpen}>
+            <Button
+              variant="contained"
+              onClick={() => handleClickOpen("建立新商品")}
+            >
               建立新商品
             </Button>
           </Stack>
@@ -134,7 +147,10 @@ export const AdminProducts = () => {
                         justifyContent="center"
                         spacing={1}
                       >
-                        <Button variant="contained" onClick={handleClickOpen}>
+                        <Button
+                          variant="contained"
+                          onClick={() => handleClickOpen("編輯商品")}
+                        >
                           編輯
                         </Button>
                         <Button variant="outlined" color="error">

@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
 } from "@mui/material";
@@ -11,17 +10,20 @@ import { FC } from "react";
 
 type ProductModalProps = {
   open?: boolean;
+  modalTitle?: string;
   handleClose?: () => void;
 };
 
 export const ProductModal: FC<ProductModalProps> = ({
   open = false,
+  modalTitle = "",
   handleClose = () => {},
 }) => {
   return (
     <Dialog
       open={open}
       onClose={handleClose}
+      sx={{ "& .MuiDialog-paper": { width: "80%" } }}
       PaperProps={{
         component: "form",
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
@@ -34,27 +36,19 @@ export const ProductModal: FC<ProductModalProps> = ({
         },
       }}
     >
-      <DialogTitle>Subscribe</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          To subscribe to this website, please enter your email address here. We
-          will send updates occasionally.
-        </DialogContentText>
+      <DialogTitle>{modalTitle}</DialogTitle>
+      <DialogContent dividers>
         <TextField
-          autoFocus
+          error
+          id="title"
           required
-          margin="dense"
-          id="name"
-          name="email"
-          label="Email Address"
-          type="email"
-          fullWidth
-          variant="standard"
+          label="標題"
+          helperText="Incorrect entry."
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button type="submit">Subscribe</Button>
+        <Button onClick={handleClose}>關閉</Button>
+        <Button type="submit">儲存</Button>
       </DialogActions>
     </Dialog>
   );

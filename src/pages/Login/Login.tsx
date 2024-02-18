@@ -13,7 +13,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import { LoginData } from "./login.type";
 import { LoadingButton } from "@mui/lab";
-import { formLabel as loginFormLabel } from "./login-config";
+import { formLabel as loginFormLabel, formKeys } from "./login-config";
 import { MuiSnackbar } from "../../components/MuiSnackbar";
 import { useNavigate } from "react-router-dom";
 
@@ -77,7 +77,7 @@ export const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* 使用Controller包裝MUI的TextField元件 */}
           <Controller
-            name="username"
+            name={formKeys.username}
             control={control}
             defaultValue=""
             render={({ field }) => (
@@ -93,7 +93,7 @@ export const Login = () => {
 
           {/* 使用Controller包裝MUI的TextField元件 */}
           <Controller
-            name="password"
+            name={formKeys.password}
             control={control}
             defaultValue=""
             render={({ field }) => (
