@@ -33,7 +33,7 @@ export const ProductModal: FC<ProductModalProps> = ({
     formState: { errors },
   } = useForm<ProductData>();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: ProductData) => {
     console.log(data);
   };
 
@@ -60,6 +60,7 @@ export const ProductModal: FC<ProductModalProps> = ({
                     label={productModalFormLabel.title}
                     error={!!errors.title}
                     helperText={errors?.title?.message?.toString()}
+                    variant="standard"
                   />
                 )}
               />
@@ -76,6 +77,117 @@ export const ProductModal: FC<ProductModalProps> = ({
                     label={productModalFormLabel.imageUrl}
                     error={!!errors.imageUrl}
                     helperText={errors?.imageUrl?.message?.toString()}
+                    variant="standard"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item={true} xs={6}>
+              <Controller
+                name={productModalFormKeys.category}
+                control={control}
+                defaultValue=""
+                rules={{ required: errorTips?.category }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label={productModalFormLabel.category}
+                    error={!!errors.category}
+                    helperText={errors?.category?.message?.toString()}
+                    variant="standard"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item={true} xs={6}>
+              <Controller
+                name={productModalFormKeys.unit}
+                control={control}
+                defaultValue=""
+                rules={{ required: errorTips?.unit }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label={productModalFormLabel.unit}
+                    error={!!errors.unit}
+                    helperText={errors?.unit?.message?.toString()}
+                    variant="standard"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item={true} xs={6}>
+              <Controller
+                name={productModalFormKeys.origin_price}
+                control={control}
+                defaultValue={0}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label={productModalFormLabel.origin_price}
+                    error={!!errors.origin_price}
+                    helperText={errors?.origin_price?.message?.toString()}
+                    variant="standard"
+                    type="number"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item={true} xs={6}>
+              <Controller
+                name={productModalFormKeys.price}
+                control={control}
+                defaultValue={0}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label={productModalFormLabel.price}
+                    error={!!errors.price}
+                    helperText={errors?.price?.message?.toString()}
+                    variant="standard"
+                    type="number"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item={true} xs={12}>
+              <Controller
+                name={productModalFormKeys.description}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label={productModalFormLabel.description}
+                    error={!!errors.description}
+                    helperText={errors?.description?.message?.toString()}
+                    variant="standard"
+                    multiline
+                    rows={3}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item={true} xs={12}>
+              <Controller
+                name={productModalFormKeys.content}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label={productModalFormLabel.content}
+                    error={!!errors.content}
+                    helperText={errors?.content?.message?.toString()}
+                    variant="standard"
+                    multiline
+                    rows={3}
                   />
                 )}
               />
