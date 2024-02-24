@@ -27,9 +27,17 @@ export const AdminProducts = () => {
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [modalTitle, setModalTitle] = useState<string>("");
+  const [modalMode, setModalMode] = useState<number>(0);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
 
-  const handleClickOpen = (title: string) => {
+  const handleClickOpen = (
+    title: string,
+    mode: number = 0,
+    editProduct: Product | null = null
+  ) => {
     setModalTitle(title);
+    setModalMode(mode); // 0 : add, 1 : edit
+    setEditProduct(editProduct);
     setIsOpenModal(true);
   };
 
@@ -84,6 +92,8 @@ export const AdminProducts = () => {
         open={isOpenModal}
         modalTitle={modalTitle}
         handleClose={handleClose}
+        mode={modalMode}
+        editProduct={editProduct}
       />
       <Typography variant="h6" mb={2}>
         產品列表
@@ -149,7 +159,9 @@ export const AdminProducts = () => {
                       >
                         <Button
                           variant="contained"
-                          onClick={() => handleClickOpen("編輯商品")}
+                          onClick={() =>
+                            handleClickOpen("編輯商品", 1, product)
+                          }
                         >
                           編輯
                         </Button>

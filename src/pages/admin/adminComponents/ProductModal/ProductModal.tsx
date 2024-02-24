@@ -5,9 +5,10 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  IconButton,
   TextField,
 } from "@mui/material";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   formLabel as productModalFormLabel,
@@ -15,23 +16,60 @@ import {
   errorTips,
 } from "./product-modal-config";
 import { ProductData } from "./productModal.type";
+import CloseIcon from "@mui/icons-material/Close";
+import { Product } from "../../adminPages/AdminProducts/adminProducts.type";
 
 type ProductModalProps = {
   open?: boolean;
   modalTitle?: string;
   handleClose?: () => void;
+  mode?: number;
+  editProduct?: Product | null;
 };
 
 export const ProductModal: FC<ProductModalProps> = ({
   open = false,
   modalTitle = "",
   handleClose = () => {},
+  mode = 0, // 0 : add, 1 : edit
+  editProduct = null,
 }) => {
   const {
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
+    reset,
   } = useForm<ProductData>();
+
+  useEffect(() => {
+    reset();
+    if (mode === 0) {
+      setValue(productModalFormKeys.title, "");
+      setValue(productModalFormKeys.imageUrl, "");
+      setValue(productModalFormKeys.category, "");
+      setValue(productModalFormKeys.unit, "");
+      setValue(productModalFormKeys.price, 0);
+      setValue(productModalFormKeys.origin_price, 0);
+      setValue(productModalFormKeys.description, "");
+      setValue(productModalFormKeys.content, "");
+    } else {
+      setValue(productModalFormKeys.title, editProduct?.title || "");
+      setValue(productModalFormKeys.imageUrl, editProduct?.imageUrl || "");
+      setValue(productModalFormKeys.category, editProduct?.category || "");
+      setValue(productModalFormKeys.unit, editProduct?.unit || "");
+      setValue(productModalFormKeys.price, editProduct?.price || 0);
+      setValue(
+        productModalFormKeys.origin_price,
+        editProduct?.origin_price || 0
+      );
+      setValue(
+        productModalFormKeys.description,
+        editProduct?.description || ""
+      );
+      setValue(productModalFormKeys.content, editProduct?.content || "");
+    }
+  }, [open]);
 
   const onSubmit = (data: ProductData) => {
     console.log(data);
@@ -41,9 +79,21 @@ export const ProductModal: FC<ProductModalProps> = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      sx={{ "& .MuiDialog-paper": { width: "80%", maxWidth: "80%" } }}
+      sx={{ "& .MuiDialog-paper": { width: "60%", minWidth: "300px" } }}
     >
-      <DialogTitle>{modalTitle}</DialogTitle>
+      <DialogTitle>
+        <Grid
+          container
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <span>{modalTitle}</span>
+          <IconButton aria-label="close" onClick={handleClose}>
+            <CloseIcon />
+          </IconButton>
+        </Grid>
+      </DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -51,7 +101,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.title}
                 control={control}
-                defaultValue=""
                 rules={{ required: errorTips?.title }}
                 render={({ field }) => (
                   <TextField
@@ -86,7 +135,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.category}
                 control={control}
-                defaultValue=""
                 rules={{ required: errorTips?.category }}
                 render={({ field }) => (
                   <TextField
@@ -104,7 +152,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.unit}
                 control={control}
-                defaultValue=""
                 rules={{ required: errorTips?.unit }}
                 render={({ field }) => (
                   <TextField
@@ -122,7 +169,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.origin_price}
                 control={control}
-                defaultValue={0}
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -140,7 +186,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.price}
                 control={control}
-                defaultValue={0}
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -158,7 +203,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.description}
                 control={control}
-                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -166,7 +210,6 @@ export const ProductModal: FC<ProductModalProps> = ({
                     label={productModalFormLabel.description}
                     error={!!errors.description}
                     helperText={errors?.description?.message?.toString()}
-                    variant="standard"
                     multiline
                     rows={3}
                   />
@@ -177,7 +220,6 @@ export const ProductModal: FC<ProductModalProps> = ({
               <Controller
                 name={productModalFormKeys.content}
                 control={control}
-                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -185,7 +227,6 @@ export const ProductModal: FC<ProductModalProps> = ({
                     label={productModalFormLabel.content}
                     error={!!errors.content}
                     helperText={errors?.content?.message?.toString()}
-                    variant="standard"
                     multiline
                     rows={3}
                   />
