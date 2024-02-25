@@ -5,8 +5,8 @@ export type ProductData = {
   id?: string;
   imageUrl?: string;
   is_enabled?: number;
-  origin_price?: number;
-  price?: number;
+  origin_price: number;
+  price: number;
   title: string;
   unit: string;
 };
