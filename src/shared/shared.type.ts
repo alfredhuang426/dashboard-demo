@@ -12,3 +12,5 @@ export type User = {
   name?: string;
   tel?: string;
 };
+
+export type Methods = "head" | "options" | "put" | "post" | "patch" | "delete" | "get";

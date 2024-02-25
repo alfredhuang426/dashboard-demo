@@ -57,12 +57,12 @@ export const AdminProducts = () => {
     getProducts(page);
   };
 
-  const getProducts = async (page = 1) => {
+  const getProducts = async (page = 1, resfreshDataAnyWay = false) => {
     setIsTableLoading(true);
     const productData = allProductData.filter(
       (product) => product.pagination?.current_page === page
     )?.[0];
-    if (productData) {
+    if (productData && !resfreshDataAnyWay) {
       setProducts(productData.products || []);
       setPagination(productData.pagination || {});
     } else {
@@ -94,6 +94,8 @@ export const AdminProducts = () => {
         handleClose={handleClose}
         mode={modalMode}
         editProduct={editProduct}
+        getProducts={getProducts}
+        currentPage={pagination.current_page}
       />
       <Typography variant="h6" mb={2}>
         產品列表

@@ -3,12 +3,13 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
   TextField,
 } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   formLabel as productModalFormLabel,
@@ -18,6 +19,9 @@ import {
 import { ProductData } from "./productModal.type";
 import CloseIcon from "@mui/icons-material/Close";
 import { Product } from "../../adminPages/AdminProducts/adminProducts.type";
+import axios from "axios";
+import { Methods } from "../../../../shared/shared.type";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 type ProductModalProps = {
   open?: boolean;
@@ -25,6 +29,8 @@ type ProductModalProps = {
   handleClose?: () => void;
   mode?: number;
   editProduct?: Product | null;
+  getProducts?: (page: number, resfreshDataAnyWay: boolean) => void;
+  currentPage?: number;
 };
 
 export const ProductModal: FC<ProductModalProps> = ({
@@ -33,6 +39,8 @@ export const ProductModal: FC<ProductModalProps> = ({
   handleClose = () => {},
   mode = 0, // 0 : add, 1 : edit
   editProduct = null,
+  getProducts = (page: number, resfreshDataAnyWay: boolean) => {},
+  currentPage = 1,
 }) => {
   const {
     handleSubmit,
@@ -41,7 +49,7 @@ export const ProductModal: FC<ProductModalProps> = ({
     setValue,
     reset,
   } = useForm<ProductData>();
-
+  const [isLoading, setIsLoadinging] = useState<boolean>(false);
   useEffect(() => {
     reset();
     if (mode === 0) {
@@ -59,6 +67,7 @@ export const ProductModal: FC<ProductModalProps> = ({
       setValue(productModalFormKeys.category, editProduct?.category || "");
       setValue(productModalFormKeys.unit, editProduct?.unit || "");
       setValue(productModalFormKeys.price, editProduct?.price || 0);
+      setValue(productModalFormKeys.id, editProduct?.id || "");
       setValue(
         productModalFormKeys.origin_price,
         editProduct?.origin_price || 0
@@ -71,8 +80,26 @@ export const ProductModal: FC<ProductModalProps> = ({
     }
   }, [open]);
 
-  const onSubmit = (data: ProductData) => {
-    console.log(data);
+  const onSubmit = async (data: ProductData) => {
+    try {
+      setIsLoadinging(true);
+      let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product`;
+      let method: Methods = "post";
+      if (mode === 1) {
+        api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product/${data.id}`;
+        method = "put";
+      }
+      const result = await axios[method](api, {
+        data,
+      });
+      setIsLoadinging(false);
+      handleClose();
+      // 如果是編輯，編輯完後回到原本的那頁，如果是新增，則回到第一頁
+      getProducts(mode === 1 ? currentPage : 1, true);
+    } catch (error) {
+      console.log(error);
+      setIsLoadinging(false);
+    }
   };
 
   return (
@@ -237,7 +264,9 @@ export const ProductModal: FC<ProductModalProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>關閉</Button>
-          <Button type="submit">儲存</Button>
+          <LoadingButton type="submit" loading={isLoading}>
+            儲存
+          </LoadingButton>
         </DialogActions>
       </form>
     </Dialog>
