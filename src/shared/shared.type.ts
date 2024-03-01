@@ -13,4 +13,21 @@ export type User = {
   tel?: string;
 };
 
-export type Methods = "head" | "options" | "put" | "post" | "patch" | "delete" | "get";
+export type Methods =
+  | "head"
+  | "options"
+  | "put"
+  | "post"
+  | "patch"
+  | "delete"
+  | "get";
+
+export type MessageState = {
+  type?: string;
+  title?: string;
+  text?: string;
+};
+
+export type MessageAction =
+  | { type: "POST_MESSAGE"; payload: MessageState }
+  | { type: "CLEAR_MESSAGE"; payload: MessageState };

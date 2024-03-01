@@ -3,13 +3,12 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
   TextField,
 } from "@mui/material";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   formLabel as productModalFormLabel,
@@ -22,6 +21,8 @@ import { Product } from "../../adminPages/AdminProducts/adminProducts.type";
 import axios from "axios";
 import { Methods } from "../../../../shared/shared.type";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { MessageContext } from "../../../../store/MessageContext";
+import { handleErrorMessage, handleSuccessMessage } from "../../../../store/MessageReducer";
 
 type ProductModalProps = {
   open?: boolean;
@@ -50,6 +51,7 @@ export const ProductModal: FC<ProductModalProps> = ({
     reset,
   } = useForm<ProductData>();
   const [isLoading, setIsLoadinging] = useState<boolean>(false);
+  const { dispatch } = useContext(MessageContext);
   useEffect(() => {
     reset();
     if (open) {
@@ -96,6 +98,7 @@ export const ProductModal: FC<ProductModalProps> = ({
       const result = await axios[method](api, {
         data,
       });
+      handleSuccessMessage(dispatch, result);
       setIsLoadinging(false);
       handleClose();
       // 如果是編輯，編輯完後回到原本的那頁，如果是新增，則回到第一頁
@@ -103,6 +106,7 @@ export const ProductModal: FC<ProductModalProps> = ({
     } catch (error) {
       console.log(error);
       setIsLoadinging(false);
+      handleErrorMessage(dispatch, error);
     }
   };
 

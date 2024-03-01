@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import { DrawerContent } from "./adminComponents/DrawerContent/DrawerContent";
 import axios from "axios";
 import { Outlet, useNavigate } from "react-router-dom";
+import { MessageContextProvider } from "../../store/MessageContext";
+import { Message } from "../../components/Message";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -68,7 +70,8 @@ export const Dashboard = () => {
   }, [navigate, token]);
 
   return (
-    <>
+    <MessageContextProvider>
+      <Message />
       {!isUserValid && (
         <Grid
           container
@@ -163,6 +166,6 @@ export const Dashboard = () => {
           </Box>
         </Box>
       )}
-    </>
+    </MessageContextProvider>
   );
 };
