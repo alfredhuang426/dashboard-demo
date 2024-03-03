@@ -15,10 +15,16 @@ import {
   Button,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Product, ProductData } from "./adminProducts.type";
 import { Pagination as ProductPagination } from "../../../../shared/shared.type";
 import { ProductModal } from "../../adminComponents/ProductModal/ProductModal";
+import { DeleteModal } from "../../adminComponents/DeleteModal/DeleteModal";
+import {
+  handleErrorMessage,
+  handleSuccessMessage,
+} from "../../../../store/MessageReducer";
+import { MessageContext } from "../../../../store/MessageContext";
 
 export const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,6 +35,12 @@ export const AdminProducts = () => {
   const [modalTitle, setModalTitle] = useState<string>("");
   const [modalMode, setModalMode] = useState<number>(0);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
+
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
+  const [deleteModalText, setDeleteModalText] = useState<string>("");
+  const [deleteProductId, setDeleteProductId] = useState<string>("");
+
+  const { dispatch } = useContext(MessageContext);
 
   const handleClickOpen = (
     title: string,
@@ -47,6 +59,7 @@ export const AdminProducts = () => {
   ) => {
     if (reason && reason === "backdropClick") return;
     setIsOpenModal(false);
+    setIsOpenDeleteModal(false);
   };
 
   useEffect(() => {
@@ -86,6 +99,28 @@ export const AdminProducts = () => {
     setIsTableLoading(false);
   };
 
+  const handleDeleteModalOpen = (text: string, id: string) => {
+    setIsOpenDeleteModal(true);
+    setDeleteModalText(text);
+    setDeleteProductId(id);
+  };
+
+  const deleteProduct = async (id: string) => {
+    try {
+      const result = await axios.delete(
+        `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product/${id}`
+      );
+      if (result.data.success) {
+        handleSuccessMessage(dispatch, result);
+        setIsOpenDeleteModal(false);
+        getProducts(1, true);
+      }
+    } catch (error) {
+      console.log(error);
+      handleErrorMessage(dispatch, error);
+    }
+  };
+
   return (
     <>
       <ProductModal
@@ -96,6 +131,13 @@ export const AdminProducts = () => {
         editProduct={editProduct}
         getProducts={getProducts}
         currentPage={pagination.current_page}
+      />
+      <DeleteModal
+        open={isOpenDeleteModal}
+        text={deleteModalText}
+        id={deleteProductId}
+        handleClose={handleClose}
+        handleDelete={deleteProduct}
       />
       <Typography variant="h6" mb={2}>
         產品列表
@@ -167,7 +209,16 @@ export const AdminProducts = () => {
                         >
                           編輯
                         </Button>
-                        <Button variant="outlined" color="error">
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() =>
+                            handleDeleteModalOpen(
+                              product?.title || "",
+                              product?.id || ""
+                            )
+                          }
+                        >
                           刪除
                         </Button>
                       </Stack>
