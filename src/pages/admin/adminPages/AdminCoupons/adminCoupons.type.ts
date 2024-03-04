@@ -6,7 +6,7 @@ export type Coupon = {
   id?: string;
   is_enabled?: number;
   num?: number;
-  percent?: number;
+  percent: number;
   title: string;
 };
 

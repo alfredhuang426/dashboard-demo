@@ -1,9 +1,11 @@
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Grid,
   IconButton,
   TextField,
@@ -15,14 +17,16 @@ import {
   formKeys as productModalFormKeys,
   errorTips,
 } from "./product-modal-config";
-import { ProductData } from "./productModal.type";
 import CloseIcon from "@mui/icons-material/Close";
 import { Product } from "../../adminPages/AdminProducts/adminProducts.type";
 import axios from "axios";
 import { Methods } from "../../../../shared/shared.type";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { MessageContext } from "../../../../store/MessageContext";
-import { handleErrorMessage, handleSuccessMessage } from "../../../../store/MessageReducer";
+import {
+  handleErrorMessage,
+  handleSuccessMessage,
+} from "../../../../store/MessageReducer";
 
 type ProductModalProps = {
   open?: boolean;
@@ -49,7 +53,7 @@ export const ProductModal: FC<ProductModalProps> = ({
     formState: { errors },
     setValue,
     reset,
-  } = useForm<ProductData>();
+  } = useForm<Product>();
   const [isLoading, setIsLoadinging] = useState<boolean>(false);
   const { dispatch } = useContext(MessageContext);
   useEffect(() => {
@@ -64,6 +68,7 @@ export const ProductModal: FC<ProductModalProps> = ({
         setValue(productModalFormKeys.origin_price, 0);
         setValue(productModalFormKeys.description, "");
         setValue(productModalFormKeys.content, "");
+        setValue(productModalFormKeys.is_enabled, 0);
       } else if (mode === 1) {
         setValue(productModalFormKeys.title, editProduct?.title || "");
         setValue(productModalFormKeys.imageUrl, editProduct?.imageUrl || "");
@@ -80,14 +85,16 @@ export const ProductModal: FC<ProductModalProps> = ({
           editProduct?.description || ""
         );
         setValue(productModalFormKeys.content, editProduct?.content || "");
+        setValue(productModalFormKeys.is_enabled, editProduct?.is_enabled || 0);
       }
     }
   }, [open]);
 
-  const onSubmit = async (data: ProductData) => {
+  const onSubmit = async (data: Product) => {
     try {
       data.price = +data.price;
       data.origin_price = +data.origin_price;
+      data.is_enabled = !!data.is_enabled ? 1 : 0;
       setIsLoadinging(true);
       let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product`;
       let method: Methods = "post";
@@ -267,6 +274,24 @@ export const ProductModal: FC<ProductModalProps> = ({
                   helperText={errors?.content?.message?.toString()}
                   multiline
                   rows={3}
+                />
+              )}
+            />
+          </Grid>
+          <Grid item={true} xs={12}>
+            <Controller
+              name={productModalFormKeys.is_enabled}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      onChange={onChange} // send value to hook form
+                      checked={!!value}
+                    />
+                  }
+                  label={productModalFormLabel.is_enabled}
                 />
               )}
             />
