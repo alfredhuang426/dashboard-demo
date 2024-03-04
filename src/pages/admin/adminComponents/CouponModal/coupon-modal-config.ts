@@ -4,12 +4,14 @@ export const formKeys: {
   due_date: "due_date";
   code: "code";
   is_enabled: "is_enabled";
+  id: "id";
 } = {
   title: "title",
   percent: "percent",
   due_date: "due_date",
   code: "code",
   is_enabled: "is_enabled",
+  id: "id",
 };
 
 export const formLabel = {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Divider,
   TableContainer,
@@ -19,6 +19,12 @@ import { Pagination as CouponPagination } from "../../../../shared/shared.type";
 import axios from "axios";
 import { Coupon, CouponData } from "./adminCoupons.type";
 import { CouponModal } from "../../adminComponents/CouponModal/CouponModal";
+import { DeleteModal } from "../../adminComponents/DeleteModal/DeleteModal";
+import {
+  handleErrorMessage,
+  handleSuccessMessage,
+} from "../../../../store/MessageReducer";
+import { MessageContext } from "../../../../store/MessageContext";
 
 export const AdminCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -34,6 +40,8 @@ export const AdminCoupons = () => {
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [deleteModalText, setDeleteModalText] = useState<string>("");
   const [deleteCouponId, setDeleteCouponId] = useState<string>("");
+
+  const { dispatch } = useContext(MessageContext);
 
   useEffect(() => {
     getCoupons();
@@ -63,12 +71,12 @@ export const AdminCoupons = () => {
     getCoupons(page);
   };
 
-  const getCoupons = async (page = 1) => {
+  const getCoupons = async (page = 1, resfreshDataAnyWay = false) => {
     setIsTableLoading(true);
     const couponData = allCouponData.filter(
       (product) => product.pagination?.current_page === page
     )?.[0];
-    if (couponData) {
+    if (couponData && !resfreshDataAnyWay) {
       setCoupons(couponData.coupons || []);
       setPagination(couponData.pagination || {});
     } else {
@@ -111,6 +119,22 @@ export const AdminCoupons = () => {
     setDeleteCouponId(id);
   };
 
+  const deleteProduct = async (id: string) => {
+    try {
+      const result = await axios.delete(
+        `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${id}`
+      );
+      if (result.data.success) {
+        handleSuccessMessage(dispatch, result);
+        setIsOpenDeleteModal(false);
+        getCoupons(1, true);
+      }
+    } catch (error) {
+      console.log(error);
+      handleErrorMessage(dispatch, error);
+    }
+  };
+
   return (
     <>
       <CouponModal
@@ -120,6 +144,14 @@ export const AdminCoupons = () => {
         mode={modalMode}
         editCoupon={editCoupon}
         getCoupons={getCoupons}
+        currentPage={pagination.current_page}
+      />
+      <DeleteModal
+        open={isOpenDeleteModal}
+        text={deleteModalText}
+        id={deleteCouponId}
+        handleClose={handleClose}
+        handleDelete={deleteProduct}
       />
       <Typography variant="h6" mb={2}>
         優惠券列表
@@ -165,7 +197,7 @@ export const AdminCoupons = () => {
               <TableBody>
                 {coupons.map((coupon) => (
                   <TableRow
-                    key={coupon?.id}
+                    key={coupon?.id || coupon?.code}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
@@ -173,13 +205,13 @@ export const AdminCoupons = () => {
                     </TableCell>
                     <TableCell align="right">{coupon?.percent}%</TableCell>
                     <TableCell align="right">
-                      {formatDate(coupon?.due_date)}
+                      {formatDate(coupon?.due_date as number)}
                     </TableCell>
                     <TableCell align="right">{coupon?.code}</TableCell>
                     <TableCell align="right">
                       {coupon?.is_enabled ? "啟用" : "未啟用"}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="center">
                       <Stack
                         direction="row"
                         justifyContent="center"

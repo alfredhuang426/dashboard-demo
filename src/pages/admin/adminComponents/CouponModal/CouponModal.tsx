@@ -21,6 +21,17 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { LoadingButton } from "@mui/lab";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/zh-tw";
+import axios from "axios";
+import { Methods } from "../../../../shared/shared.type";
+import {
+  handleErrorMessage,
+  handleSuccessMessage,
+} from "../../../../store/MessageReducer";
 
 type CouponModalProps = {
   open?: boolean;
@@ -28,7 +39,8 @@ type CouponModalProps = {
   handleClose?: () => void;
   mode?: number;
   editCoupon?: Coupon | null;
-  getCoupons?: (page: number) => void;
+  getCoupons?: (page: number, resfreshDataAnyWay: boolean) => void;
+  currentPage?: number;
 };
 
 export const CouponModal: FC<CouponModalProps> = ({
@@ -37,7 +49,8 @@ export const CouponModal: FC<CouponModalProps> = ({
   handleClose = () => {},
   mode = 0, // 0 : add, 1 : edit
   editCoupon = null,
-  getCoupons = (page: number) => {},
+  getCoupons = (page = 1, resfreshDataAnyWay: boolean) => {},
+  currentPage = 1,
 }) => {
   const {
     handleSubmit,
@@ -56,7 +69,7 @@ export const CouponModal: FC<CouponModalProps> = ({
       if (mode === 0) {
         setValue(couponModalFormKeys.title, "");
         setValue(couponModalFormKeys.percent, 0);
-        setValue(couponModalFormKeys.due_date, new Date().getTime());
+        setValue(couponModalFormKeys.due_date, dayjs());
         setValue(couponModalFormKeys.code, "");
         setValue(couponModalFormKeys.is_enabled, 0);
       } else if (mode === 1) {
@@ -64,10 +77,11 @@ export const CouponModal: FC<CouponModalProps> = ({
         setValue(couponModalFormKeys.percent, editCoupon?.percent || 0);
         setValue(
           couponModalFormKeys.due_date,
-          editCoupon?.due_date || new Date().getTime()
+          editCoupon?.due_date ? dayjs(editCoupon?.due_date) : dayjs()
         );
         setValue(couponModalFormKeys.code, editCoupon?.code || "");
         setValue(couponModalFormKeys.is_enabled, editCoupon?.is_enabled || 0);
+        setValue(couponModalFormKeys.id, editCoupon?.id || "");
       }
     }
   }, [open]);
@@ -75,7 +89,38 @@ export const CouponModal: FC<CouponModalProps> = ({
   const onSubmit = async (data: Coupon) => {
     data.percent = +data.percent;
     data.is_enabled = !!data.is_enabled ? 1 : 0;
-    console.log(data);
+    data.due_date = (data.due_date as Dayjs).valueOf();
+    setIsLoadinging(true);
+    try {
+      let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon`;
+      let method: Methods = "post";
+      if (mode === 1) {
+        api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${data.id}`;
+        method = "put";
+      }
+      const result = await axios[method](api, {
+        data,
+      });
+      if (result.data.success) {
+        handleSuccessMessage(dispatch, result);
+        setIsLoadinging(false);
+        handleClose();
+        getCoupons(mode === 1 ? currentPage : 1, true);
+      } else {
+        handleErrorMessage(dispatch, {
+          response: {
+            data: {
+              message: result.data.message,
+            },
+          },
+        });
+        setIsLoadinging(false);
+      }
+    } catch (error) {
+      console.log(error);
+      handleErrorMessage(dispatch, error);
+      setIsLoadinging(false);
+    }
   };
 
   return (
@@ -137,7 +182,30 @@ export const CouponModal: FC<CouponModalProps> = ({
               )}
             />
           </Grid>
-          <Grid item={true} xs={6}></Grid>
+          <Grid item={true} xs={6}>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale="zh-tw"
+            >
+              <Controller
+                control={control}
+                name={couponModalFormKeys.due_date}
+                rules={{ required: true }}
+                render={({ field }) => {
+                  return (
+                    <DatePicker
+                      label={couponModalFormLabel.due_date}
+                      value={field.value}
+                      inputRef={field.ref}
+                      onChange={(date) => {
+                        field.onChange(date);
+                      }}
+                    />
+                  );
+                }}
+              />
+            </LocalizationProvider>
+          </Grid>
           <Grid item={true} xs={6}>
             <Controller
               name={couponModalFormKeys.code}
