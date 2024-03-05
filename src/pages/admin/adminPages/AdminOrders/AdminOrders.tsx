@@ -11,11 +11,13 @@ import {
   Box,
   CircularProgress,
   Grid,
+  Button,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Order, OrderData } from "./adminOrders.type";
 import { Pagination as OrderPagination } from "../../../../shared/shared.type";
+import { OrderModal } from "../../adminComponents/OrderModal/OrderModal";
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -23,9 +25,27 @@ export const AdminOrders = () => {
   const [pagination, setPagination] = useState<OrderPagination>({});
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
 
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [modalTitle, setModalTitle] = useState<string>("");
+  const [orderData, setOrderData] = useState<Order | null>(null);
+
   useEffect(() => {
     getOrders();
   }, []);
+
+  const handleClickOpen = (orderData: Order | null = null) => {
+    setModalTitle(`訂單${orderData?.id}資訊`);
+    setOrderData(orderData);
+    setIsOpenModal(true);
+  };
+
+  const handleClose = (
+    event?: React.FormEvent<HTMLFormElement>,
+    reason?: string
+  ) => {
+    if (reason && reason === "backdropClick") return;
+    setIsOpenModal(false);
+  };
 
   const handleChange = (event: React.ChangeEvent<unknown>, page: number) => {
     getOrders(page);
@@ -62,6 +82,12 @@ export const AdminOrders = () => {
 
   return (
     <>
+      <OrderModal
+        open={isOpenModal}
+        modalTitle={modalTitle}
+        handleClose={handleClose}
+        orderData={orderData}
+      />
       <Typography variant="h6" mb={2}>
         訂單列表
       </Typography>
@@ -87,7 +113,7 @@ export const AdminOrders = () => {
                   <TableCell align="right">訂單金額</TableCell>
                   <TableCell align="right">付款狀態</TableCell>
                   <TableCell align="right">留言訊息</TableCell>
-                  <TableCell align="right">編輯</TableCell>
+                  <TableCell align="center">資訊</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -96,7 +122,7 @@ export const AdminOrders = () => {
                     key={order?.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
-                    <TableCell component="th" scope="row">
+                    <TableCell>
                       {order?.id}
                     </TableCell>
                     <TableCell align="right">{order?.user?.name}</TableCell>
@@ -109,7 +135,14 @@ export const AdminOrders = () => {
                       )}
                     </TableCell>
                     <TableCell align="right">{order.message}</TableCell>
-                    <TableCell align="right"></TableCell>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => handleClickOpen(order)}
+                      >
+                        詳情
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

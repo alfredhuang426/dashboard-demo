@@ -6,10 +6,19 @@ export type Order = {
   id?: string;
   is_paid?: boolean;
   num?: number;
-  products?: { [key: string]: Product };
+  products?: {
+    [key: string]: {
+      final_total: number;
+      id: string;
+      product: Product;
+      product_id: string;
+      qty: number;
+      total: number;
+    };
+  };
   total?: number;
   user?: User;
-  message?:string;
+  message?: string;
 };
 
 export type OrderData = {

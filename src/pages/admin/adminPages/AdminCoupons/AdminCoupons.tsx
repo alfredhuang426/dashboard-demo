@@ -200,7 +200,7 @@ export const AdminCoupons = () => {
                     key={coupon?.id || coupon?.code}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
-                    <TableCell component="th" scope="row">
+                    <TableCell>
                       {coupon?.title}
                     </TableCell>
                     <TableCell align="right">{coupon?.percent}%</TableCell>
