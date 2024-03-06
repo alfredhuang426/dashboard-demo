@@ -8,9 +8,11 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  Stack,
   TextField,
+  styled,
 } from "@mui/material";
-import { FC, useContext, useEffect, useState } from "react";
+import { ChangeEvent, FC, useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   formLabel as productModalFormLabel,
@@ -18,6 +20,7 @@ import {
   errorTips,
 } from "./product-modal-config";
 import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Product } from "../../adminPages/AdminProducts/adminProducts.type";
 import axios from "axios";
 import { Methods } from "../../../../shared/shared.type";
@@ -37,6 +40,18 @@ type ProductModalProps = {
   getProducts?: (page: number, resfreshDataAnyWay: boolean) => void;
   currentPage?: number;
 };
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 export const ProductModal: FC<ProductModalProps> = ({
   open = false,
@@ -117,6 +132,22 @@ export const ProductModal: FC<ProductModalProps> = ({
     }
   };
 
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event?.target?.files?.[0];
+      console.log(file);
+      const formData = new FormData();
+      formData.append("file-to-upload", file as File);
+      const url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/upload`;
+      const result = await axios.post(url, formData);
+      if (result.data.success) {
+        setValue(productModalFormKeys.imageUrl, result?.data?.imageUrl);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -161,23 +192,6 @@ export const ProductModal: FC<ProductModalProps> = ({
           </Grid>
           <Grid item={true} xs={6}>
             <Controller
-              name={productModalFormKeys.imageUrl}
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label={productModalFormLabel.imageUrl}
-                  error={!!errors.imageUrl}
-                  helperText={errors?.imageUrl?.message?.toString()}
-                  variant="standard"
-                />
-              )}
-            />
-          </Grid>
-          <Grid item={true} xs={6}>
-            <Controller
               name={productModalFormKeys.category}
               control={control}
               rules={{ required: errorTips?.category }}
@@ -188,23 +202,6 @@ export const ProductModal: FC<ProductModalProps> = ({
                   label={productModalFormLabel.category}
                   error={!!errors.category}
                   helperText={errors?.category?.message?.toString()}
-                  variant="standard"
-                />
-              )}
-            />
-          </Grid>
-          <Grid item={true} xs={6}>
-            <Controller
-              name={productModalFormKeys.unit}
-              control={control}
-              rules={{ required: errorTips?.unit }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label={productModalFormLabel.unit}
-                  error={!!errors.unit}
-                  helperText={errors?.unit?.message?.toString()}
                   variant="standard"
                 />
               )}
@@ -243,6 +240,96 @@ export const ProductModal: FC<ProductModalProps> = ({
                 />
               )}
             />
+          </Grid>
+          <Grid item={true} xs={6}>
+            <Controller
+              name={productModalFormKeys.unit}
+              control={control}
+              rules={{ required: errorTips?.unit }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label={productModalFormLabel.unit}
+                  error={!!errors.unit}
+                  helperText={errors?.unit?.message?.toString()}
+                  variant="standard"
+                />
+              )}
+            />
+          </Grid>
+          <Grid item={true} xs={12} mb={2}>
+            <Grid container>
+              <Grid
+                item={true}
+                xs={3}
+                sx={{ display: "flex" }}
+                alignItems="flex-end"
+              >
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<CloudUploadIcon />}
+                >
+                  上傳圖片
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={handleFileUpload}
+                  />
+                </Button>
+              </Grid>
+              <Grid item={true} xs={9}>
+                <Controller
+                  name={productModalFormKeys.imageUrl}
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label={productModalFormLabel.imageUrl}
+                      error={!!errors.imageUrl}
+                      helperText={errors?.imageUrl?.message?.toString()}
+                      variant="standard"
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+            {/* <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="flex-end"
+              spacing={2}
+            >
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+              >
+                上傳圖片
+                <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
+              </Button>
+              <Controller
+                name={productModalFormKeys.imageUrl}
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    
+                    label={productModalFormLabel.imageUrl}
+                    error={!!errors.imageUrl}
+                    helperText={errors?.imageUrl?.message?.toString()}
+                    variant="standard"
+                  />
+                )}
+              />
+            </Stack> */}
           </Grid>
           <Grid item={true} xs={12}>
             <Controller
