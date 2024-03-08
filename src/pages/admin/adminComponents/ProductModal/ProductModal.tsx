@@ -8,9 +8,7 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  Stack,
   TextField,
-  styled,
 } from "@mui/material";
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -40,18 +38,6 @@ type ProductModalProps = {
   getProducts?: (page: number, resfreshDataAnyWay: boolean) => void;
   currentPage?: number;
 };
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
 
 export const ProductModal: FC<ProductModalProps> = ({
   open = false,
@@ -274,10 +260,7 @@ export const ProductModal: FC<ProductModalProps> = ({
                   startIcon={<CloudUploadIcon />}
                 >
                   上傳圖片
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={handleFileUpload}
-                  />
+                  <input hidden type="file" onChange={handleFileUpload} />
                 </Button>
               </Grid>
               <Grid item={true} xs={9}>
@@ -298,38 +281,6 @@ export const ProductModal: FC<ProductModalProps> = ({
                 />
               </Grid>
             </Grid>
-            {/* <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="flex-end"
-              spacing={2}
-            >
-              <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-              >
-                上傳圖片
-                <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
-              </Button>
-              <Controller
-                name={productModalFormKeys.imageUrl}
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    
-                    label={productModalFormLabel.imageUrl}
-                    error={!!errors.imageUrl}
-                    helperText={errors?.imageUrl?.message?.toString()}
-                    variant="standard"
-                  />
-                )}
-              />
-            </Stack> */}
           </Grid>
           <Grid item={true} xs={12}>
             <Controller
