@@ -58,8 +58,8 @@ export const ProductModal: FC<ProductModalProps> = ({
   const [isLoading, setIsLoadinging] = useState<boolean>(false);
   const { dispatch } = useContext(MessageContext);
   useEffect(() => {
-    reset();
     if (open) {
+      reset();
       if (mode === 0) {
         setValue(productModalFormKeys.title, "");
         setValue(productModalFormKeys.imageUrl, "");
