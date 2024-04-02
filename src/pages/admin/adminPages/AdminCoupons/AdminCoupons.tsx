@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { Pagination as CouponPagination } from "../../../../shared/shared.type";
 import axios from "axios";
-import { Coupon, CouponData } from "./adminCoupons.type";
+import { Coupon } from "./adminCoupons.type";
 import { CouponModal } from "../../adminComponents/CouponModal/CouponModal";
 import { DeleteModal } from "../../adminComponents/DeleteModal/DeleteModal";
 import {
@@ -28,7 +28,6 @@ import { MessageContext } from "../../../../store/MessageContext";
 
 export const AdminCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [allCouponData, setAllCouponData] = useState<CouponData[]>([]);
   const [pagination, setPagination] = useState<CouponPagination>({});
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
 
@@ -71,31 +70,16 @@ export const AdminCoupons = () => {
     getCoupons(page);
   };
 
-  const getCoupons = async (page = 1, resfreshDataAnyWay = false) => {
+  const getCoupons = async (page = 1) => {
     setIsTableLoading(true);
-    const couponData = allCouponData.filter(
-      (product) => product.pagination?.current_page === page
-    )?.[0];
-    if (couponData && !resfreshDataAnyWay) {
-      setCoupons(couponData.coupons || []);
-      setPagination(couponData.pagination || {});
-    } else {
-      try {
-        const couponsResult = await axios.get(
-          `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupons?page=${page}`
-        );
-        setAllCouponData((originalAllCouponData) => [
-          ...originalAllCouponData,
-          {
-            coupons: couponsResult.data.coupons,
-            pagination: couponsResult.data.pagination,
-          },
-        ]);
-        setCoupons(couponsResult.data.coupons);
-        setPagination(couponsResult.data.pagination);
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      const couponsResult = await axios.get(
+        `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupons?page=${page}`
+      );
+      setCoupons(couponsResult.data.coupons);
+      setPagination(couponsResult.data.pagination);
+    } catch (error) {
+      console.log(error);
     }
     setIsTableLoading(false);
   };
@@ -127,7 +111,7 @@ export const AdminCoupons = () => {
       if (result.data.success) {
         handleSuccessMessage(dispatch, result);
         setIsOpenDeleteModal(false);
-        getCoupons(1, true);
+        getCoupons(1);
       }
     } catch (error) {
       console.log(error);
@@ -200,9 +184,7 @@ export const AdminCoupons = () => {
                     key={coupon?.id || coupon?.code}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
-                    <TableCell>
-                      {coupon?.title}
-                    </TableCell>
+                    <TableCell>{coupon?.title}</TableCell>
                     <TableCell align="right">{coupon?.percent}%</TableCell>
                     <TableCell align="right">
                       {formatDate(coupon?.due_date as number)}

@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { Product, ProductData } from "./adminProducts.type";
+import { Product } from "./adminProducts.type";
 import { Pagination as ProductPagination } from "../../../../shared/shared.type";
 import { ProductModal } from "../../adminComponents/ProductModal/ProductModal";
 import { DeleteModal } from "../../adminComponents/DeleteModal/DeleteModal";
@@ -28,7 +28,6 @@ import { MessageContext } from "../../../../store/MessageContext";
 
 export const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [allProductData, setAllProductData] = useState<ProductData[]>([]);
   const [pagination, setPagination] = useState<ProductPagination>({});
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -70,31 +69,16 @@ export const AdminProducts = () => {
     getProducts(page);
   };
 
-  const getProducts = async (page = 1, resfreshDataAnyWay = false) => {
+  const getProducts = async (page = 1) => {
     setIsTableLoading(true);
-    const productData = allProductData.filter(
-      (product) => product.pagination?.current_page === page
-    )?.[0];
-    if (productData && !resfreshDataAnyWay) {
-      setProducts(productData.products || []);
-      setPagination(productData.pagination || {});
-    } else {
-      try {
-        const productsResult = await axios.get(
-          `/v2/api/${process.env.REACT_APP_API_PATH}/admin/products?page=${page}`
-        );
-        setAllProductData((originalAllProductData) => [
-          ...originalAllProductData,
-          {
-            products: productsResult.data.products,
-            pagination: productsResult.data.pagination,
-          },
-        ]);
-        setProducts(productsResult.data.products);
-        setPagination(productsResult.data.pagination);
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      const productsResult = await axios.get(
+        `/v2/api/${process.env.REACT_APP_API_PATH}/admin/products?page=${page}`
+      );
+      setProducts(productsResult.data.products);
+      setPagination(productsResult.data.pagination);
+    } catch (error) {
+      console.log(error);
     }
     setIsTableLoading(false);
   };
@@ -113,7 +97,7 @@ export const AdminProducts = () => {
       if (result.data.success) {
         handleSuccessMessage(dispatch, result);
         setIsOpenDeleteModal(false);
-        getProducts(1, true);
+        getProducts(1);
       }
     } catch (error) {
       console.log(error);
@@ -187,9 +171,7 @@ export const AdminProducts = () => {
                     key={product?.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
-                    <TableCell>
-                      {product?.category}
-                    </TableCell>
+                    <TableCell>{product?.category}</TableCell>
                     <TableCell align="right">{product?.title}</TableCell>
                     <TableCell align="right">{product?.price}</TableCell>
                     <TableCell align="center">
