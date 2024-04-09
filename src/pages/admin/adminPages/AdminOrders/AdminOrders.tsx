@@ -112,7 +112,7 @@ export const AdminOrders = () => {
                   <TableCell>購買用戶</TableCell>
                   <TableCell align="right">訂單金額</TableCell>
                   <TableCell align="right">付款狀態</TableCell>
-                  <TableCell align="right">留言訊息</TableCell>
+                  <TableCell align="left">留言訊息</TableCell>
                   <TableCell align="center">資訊</TableCell>
                 </TableRow>
               </TableHead>
@@ -134,7 +134,7 @@ export const AdminOrders = () => {
                         <Typography color="error.main">未付款</Typography>
                       )}
                     </TableCell>
-                    <TableCell align="right">{order.message}</TableCell>
+                    <TableCell align="left">{order.message}</TableCell>
                     <TableCell align="center">
                       <Button
                         variant="contained"
