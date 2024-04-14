@@ -175,7 +175,7 @@ export const AdminCoupons = () => {
                   <TableCell align="right">到期日</TableCell>
                   <TableCell align="right">優惠碼</TableCell>
                   <TableCell align="right">啟用狀態</TableCell>
-                  <TableCell align="right">編輯</TableCell>
+                  <TableCell align="center">編輯</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
